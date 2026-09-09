@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIVA Inmobiliaria | Propiedades en venta y renta en Monterrey</title>
+<meta name="description" content="Catálogo de propiedades en venta y renta en Monterrey y área metropolitana. NIVA Inmobiliaria.">
+<style>
+  :root{
+    --bg:#f7f5f2; --surface:#ffffff; --text:#1c1b19; --muted:#6b6660;
+    --accent:#0f5132; --accent-2:#c7a252; --border:#e7e2db;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);}
+  header{background:var(--text);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  header .brand{font-size:20px;font-weight:bold;letter-spacing:1px;}
+  header .brand span{color:var(--accent-2);}
+  header a.cta{background:var(--accent-2);color:#1c1b19;padding:10px 18px;border-radius:4px;text-decoration:none;font-weight:bold;font-size:14px;}
+  .hero{padding:56px 24px;text-align:center;background:linear-gradient(180deg,#1c1b19,#2b2926);color:#fff;}
+  .hero h1{font-size:32px;margin:0 0 12px;}
+  .hero p{color:#cfc9c1;max-width:560px;margin:0 auto;font-size:16px;}
+  .filters{max-width:1100px;margin:24px auto 0;padding:0 24px;display:flex;gap:12px;flex-wrap:wrap;}
+  .filters button{background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;}
+  .filters button.active{background:var(--text);color:#fff;border-color:var(--text);}
+  .grid{max-width:1100px;margin:24px auto 60px;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;}
+  .card img{width:100%;height:170px;object-fit:cover;background:#ddd;}
+  .card .body{padding:14px;flex:1;display:flex;flex-direction:column;}
+  .card .title{font-size:14px;font-weight:bold;color:var(--text);margin:0 0 8px;height:38px;overflow:hidden;line-height:1.35;}
+  .card .price{font-size:16px;font-weight:bold;color:var(--accent);margin:0 0 10px;}
+  .card a.link{margin-top:auto;display:block;text-align:center;background:var(--text);color:#fff;padding:9px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:bold;}
+  .status{text-align:center;padding:40px;color:var(--muted);}
+  footer{background:var(--text);color:#cfc9c1;padding:32px 24px;text-align:center;font-size:13px;}
+  footer a{color:var(--accent-2);text-decoration:none;}
+  .whatsapp{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;border-radius:50px;padding:14px 20px;text-decoration:none;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,.3);font-size:14px;z-index:20;}
+</style>
+</head>
+<body>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '4773573519633719');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=4773573519633719&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<header>
+  <div class="brand">NIVA <span>INMOBILIARIA</span></div>
+  <a class="cta" href="https://wa.me/5218112345678" target="_blank" rel="noopener">Contáctanos</a>
+</header>
+
+<section class="hero">
+  <h1>Encuentra tu próxima propiedad en Monterrey</h1>
+  <p>Casas, departamentos, oficinas y locales en venta y renta. Catálogo actualizado por nuestro equipo de asesores.</p>
+</section>
+
+<div class="filters" id="filters">
+  <button data-f="all" class="active">Todas</button>
+  <button data-f="sale">Venta</button>
+  <button data-f="rental">Renta</button>
+</div>
+
+<div id="grid" class="grid"><div class="status">Cargando propiedades…</div></div>
+
+<footer>
+  NIVA Inmobiliaria — Monterrey, Nuevo León · <a href="https://wa.me/5218112345678" target="_blank" rel="noopener">WhatsApp</a>
+</footer>
+
+<a class="whatsapp" href="https://wa.me/5218112345678" target="_blank" rel="noopener">💬 WhatsApp</a>
+
+<script>
+const FEED_URL = "https://gjyzdwsfdmdfhcspvxbz.supabase.co/functions/v1/niva-catalog-feed?apikey=sb_publishable_dFFmvWGP_RUfk1rOL-2gYw_N9SW_3dk";
+let ALL_ITEMS = [];
+
+function parseCSV(str){
+  const rows=[]; let row=[]; let field=''; let inQ=false;
+  for(let i=0;i<str.length;i++){
+    const c=str[i];
+    if(inQ){ if(c=='"'){ if(str[i+1]=='"'){field+='"';i++;} else inQ=false; } else field+=c; }
+    else { if(c=='"') inQ=true; else if(c==','){ row.push(field); field=''; } else if(c=='\n'){ row.push(field); rows.push(row); row=[]; field=''; } else if(c=='\r'){} else field+=c; }
+  }
+  if(field.length||row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function render(filter){
+  const grid = document.getElementById('grid');
+  const items = filter==='all' ? ALL_ITEMS : ALL_ITEMS.filter(i => i.availability_type === filter);
+  if(!items.length){ grid.innerHTML = '<div class="status">No hay propiedades en esta categoría por el momento.</div>'; return; }
+  grid.innerHTML = items.map(it => `
+    <div class="card">
+      <img src="${it.image}" loading="lazy" alt="${it.title.replace(/"/g,'')}">
+      <div class="body">
+        <p class="title">${it.title}</p>
+        <p class="price">${it.price}</p>
+        <a class="link" href="${it.link}" target="_blank" rel="noopener" onclick="fbq('track','ViewContent',{content_name:'${it.title.replace(/'/g,"\\'")}'});">Ver propiedad</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+fetch(FEED_URL)
+  .then(r => r.text())
+  .then(text => {
+    const rows = parseCSV(text);
+    const header = rows[0];
+    const idx = Object.fromEntries(header.map((h,i)=>[h,i]));
+    ALL_ITEMS = rows.slice(1).filter(r=>r.length>1).map(r => ({
+      title: r[idx.title],
+      price: r[idx.price],
+      link: r[idx.link],
+      image: r[idx.image_link],
+      availability_type: (r[idx.price]||'').includes('/mes') ? 'rental' : 'sale'
+    }));
+    render('all');
+  })
+  .catch(() => {
+    document.getElementById('grid').innerHTML = '<div class="status">No se pudo cargar el catálogo en este momento. Intenta de nuevo más tarde.</div>';
+  });
+
+document.getElementById('filters').addEventListener('click', (e) => {
+  if(e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#filters button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  render(e.target.dataset.f);
+});
+</script>
+
+</body>
+</html>
